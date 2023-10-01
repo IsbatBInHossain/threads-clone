@@ -37,3 +37,34 @@ export async function createThread({
     throw new Error(`Error creating thread: ${error.message}`)
   }
 }
+
+export async function fetchThreads(pageNumber = 1, pageSize = 20) {
+  connectToDB()
+
+  const skip = (pageNumber - 1) * pageSize
+
+  const threadsQuery = Thread.find({
+    parentId: { $in: [null, undefined] },
+  })
+    .sort({ createdAt: 'desc' })
+    .skip(skip)
+    .limit(pageSize)
+    .populate({ path: 'author', model: User })
+    .populate({
+      path: 'children',
+      populate: {
+        path: 'author',
+        model: User,
+        select: '_id name parentId image',
+      },
+    })
+
+  const totalThreadsCount = await Thread.countDocuments({
+    parentId: { $in: [null, undefined] },
+  })
+
+  const threads = await threadsQuery.exec()
+  const isNext = totalThreadsCount > skip + threads.length
+
+  return { threads, isNext }
+}
