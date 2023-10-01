@@ -19,7 +19,7 @@ export default async function Home() {
               <ThreadCard
                 key={thread.id}
                 id={thread.id}
-                currentUserId={user?.id}
+                currentUserId={user?.id || ''}
                 parentId={thread.parentId}
                 author={thread.author}
                 content={thread.text}
