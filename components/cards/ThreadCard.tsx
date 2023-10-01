@@ -70,7 +70,7 @@ const ThreadCard = ({
                   height={24}
                   className='cursor-pointer object-contain'
                 />
-                <Link href={`/threads/${id}`}>
+                <Link href={`/thread/${id}`}>
                   <Image
                     src='/assets/reply.svg'
                     alt='reply'
@@ -96,7 +96,7 @@ const ThreadCard = ({
               </div>
 
               {isComment && comments.length > 0 && (
-                <Link href={`/threads/${id}`}>
+                <Link href={`/thread/${id}`}>
                   <p className='mt-1 text-subtle-medium text-gray-1'>
                     {comments.length} replies
                   </p>
