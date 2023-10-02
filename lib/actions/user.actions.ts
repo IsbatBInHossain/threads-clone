@@ -1,33 +1,34 @@
-'use server';
+'use server'
 
-import { FilterQuery, SortOrder } from 'mongoose';
-import { revalidatePath } from 'next/cache';
+import { FilterQuery, SortOrder } from 'mongoose'
+import { revalidatePath } from 'next/cache'
 
-import Community from '../models/Community.model';
-import User from '../models/User.model';
+import Community from '../models/Community.model'
+import User from '../models/User.model'
 
-import { connectToDB } from '../mongoose';
+import { connectToDB } from '../mongoose'
+import Thread from '../models/Thread.model'
+
+interface UpdateUserParams {
+  userId: string
+  username: string
+  name: string
+  bio: string
+  image: string
+  path: string
+}
 
 export async function fetchUser(userId: string) {
   try {
-    connectToDB();
+    connectToDB()
 
     return await User.findOne({ id: userId }).populate({
       path: 'communities',
       model: Community,
-    });
+    })
   } catch (error: any) {
-    throw new Error(`Failed to fetch user: ${error.message}`);
+    throw new Error(`Failed to fetch user: ${error.message}`)
   }
-}
-
-interface Params {
-  userId: string;
-  username: string;
-  name: string;
-  bio: string;
-  image: string;
-  path: string;
 }
 
 export async function updateUser({
@@ -37,9 +38,9 @@ export async function updateUser({
   path,
   username,
   image,
-}: Params): Promise<void> {
+}: UpdateUserParams): Promise<void> {
   try {
-    connectToDB();
+    connectToDB()
 
     await User.findOneAndUpdate(
       { id: userId },
@@ -51,12 +52,37 @@ export async function updateUser({
         onboarded: true,
       },
       { upsert: true }
-    );
+    )
 
     if (path === '/profile/edit') {
-      revalidatePath(path);
+      revalidatePath(path)
     }
   } catch (error: any) {
-    throw new Error(`Failed to create/update user: ${error.message}`);
+    throw new Error(`Failed to create/update user: ${error.message}`)
+  }
+}
+
+export async function fetchUserPosts(userId: string) {
+  try {
+    connectToDB()
+
+    // TODO Populate community
+    const threads = await User.findOne({ id: userId }).populate({
+      path: 'threads',
+      model: Thread,
+      populate: {
+        path: 'children',
+        model: Thread,
+        populate: {
+          path: 'author',
+          model: User,
+          select: 'name image id',
+        },
+      },
+    })
+
+    return threads
+  } catch (error: any) {
+    throw new Error(`Error fetching post: ${error.message}`)
   }
 }
