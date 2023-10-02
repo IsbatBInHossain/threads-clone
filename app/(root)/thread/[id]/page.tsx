@@ -1,4 +1,44 @@
-const Page = ({ params }: { params: { id: string } }) => {
-  return <div>page</div>
+import Comment from '@/components/forms/Comment'
+import ThreadCard from '@/components/cards/ThreadCard'
+import { fetchThreadById } from '@/lib/actions/thread.actions'
+import { fetchUser } from '@/lib/actions/user.actions'
+import { currentUser } from '@clerk/nextjs'
+import { redirect } from 'next/navigation'
+
+const Page = async ({ params }: { params: { id: string } }) => {
+  if (!params.id) return null
+
+  const user = await currentUser()
+  if (!user) return null
+
+  const userInfo = await fetchUser(user.id)
+  if (!userInfo.onboarded) redirect('/onboarding')
+
+  const thread = await fetchThreadById(params.id)
+
+  return (
+    <section className='relative'>
+      <div>
+        <ThreadCard
+          key={thread.id}
+          id={thread.id}
+          currentUserId={user?.id || ''}
+          parentId={thread.parentId}
+          author={thread.author}
+          content={thread.text}
+          community={thread.community}
+          createdAt={thread.createdAt}
+          comments={thread.children}
+        />
+      </div>
+      <div className='mt-7 '>
+        <Comment
+          threadId={thread.id}
+          currentUserImg={user.imageUrl}
+          currentUserId={JSON.stringify(userInfo._id)}
+        />
+      </div>
+    </section>
+  )
 }
 export default Page

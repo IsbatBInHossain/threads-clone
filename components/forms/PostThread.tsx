@@ -19,8 +19,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { ThreadValidation } from '@/lib/validations/thread'
 import { createThread } from '@/lib/actions/thread.actions'
 
-// import { updateUser } from '@/lib/actions/user.actions'
-
 const PostThread = ({ userId }: { userId: string }) => {
   const router = useRouter()
   const pathname = usePathname()
@@ -58,7 +56,7 @@ const PostThread = ({ userId }: { userId: string }) => {
               <FormLabel className='text-base-semibold text-light-2'>
                 Content
               </FormLabel>
-              <FormControl className=' no-foucus border border-dark-4 bg-dark-3 text-light-1'>
+              <FormControl className=' no-focus border border-dark-4 bg-dark-3 text-light-1'>
                 <Textarea rows={15} {...field} />
               </FormControl>
               <FormMessage />
