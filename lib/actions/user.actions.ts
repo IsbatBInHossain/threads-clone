@@ -18,6 +18,14 @@ interface UpdateUserParams {
   path: string
 }
 
+interface FetchUsersProps {
+  userId: string
+  searchString?: string
+  pageNumber?: number
+  pageSize?: number
+  sortBy: SortOrder
+}
+
 export async function fetchUser(userId: string) {
   try {
     connectToDB()
@@ -84,5 +92,45 @@ export async function fetchUserPosts(userId: string) {
     return threads
   } catch (error: any) {
     throw new Error(`Error fetching post: ${error.message}`)
+  }
+}
+
+export async function fetchUsers({
+  userId,
+  searchString = '',
+  pageNumber = 1,
+  pageSize = 20,
+  sortBy = 'desc',
+}: FetchUsersProps) {
+  try {
+    connectToDB()
+
+    const skip = (pageNumber - 1) * pageSize
+
+    const regex = new RegExp(searchString, 'i')
+
+    const query: FilterQuery<typeof User> = {
+      id: { $ne: userId },
+    }
+
+    if (searchString.trim() !== '') {
+      query.$or = [{ username: { $regex: regex } }, { name: { $regex: regex } }]
+    }
+
+    const sortOptions = { createdAt: sortBy }
+
+    const usersQuery = User.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(pageSize)
+
+    const totalUsersCount = await User.countDocuments(query)
+
+    const users = await usersQuery.exec()
+    const isNext = totalUsersCount > skip + users.length
+
+    return { users, isNext }
+  } catch (error: any) {
+    throw new Error(`Error fetching Users: ${error.message}`)
   }
 }
