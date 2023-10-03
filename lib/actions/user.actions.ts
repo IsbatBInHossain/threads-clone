@@ -144,8 +144,9 @@ export async function getNotification(userId: string) {
 
     // collect all the child thread ids (replies) from the children field
 
-    const childThreadIds = userThreads.reduce((acc, userThread) =>
-      acc.concat(userThread.children)
+    const childThreadIds = userThreads.reduce(
+      (acc, userThread) => acc.concat(userThread.children),
+      []
     )
 
     const replies = await Thread.find({
