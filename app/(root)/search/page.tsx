@@ -1,10 +1,6 @@
-import ProfileHeader from '@/components/shared/ProfileHeader'
-import { profileTabs } from '@/constants'
 import { fetchUser, fetchUsers } from '@/lib/actions/user.actions'
 import { currentUser } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
-import Image from 'next/image'
-import ThreadsTab from '@/components/shared/ThreadsTab'
 import UserCard from '@/components/cards/UserCard'
 
 const SearchPage = async () => {
@@ -12,6 +8,7 @@ const SearchPage = async () => {
   if (!user) return null
   const userInfo = await fetchUser(user.id)
 
+  if (!userInfo.onboarded) redirect('/onboarding')
   // Fetch Users
 
   const result = await fetchUsers({
@@ -21,8 +18,6 @@ const SearchPage = async () => {
     pageSize: 25,
     sortBy: 'desc',
   })
-
-  if (!userInfo.onboarded) redirect('/onboarding')
 
   return (
     <section>
