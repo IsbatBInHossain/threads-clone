@@ -7,6 +7,7 @@ interface Props {
   username: string
   imgUrl: string
   bio: string
+  type?: 'User' | 'Community'
 }
 
 const ProfileHeader = ({
@@ -16,6 +17,7 @@ const ProfileHeader = ({
   username,
   imgUrl,
   bio,
+  type,
 }: Props) => {
   return (
     <div className='flex w-full flex-col justify-start'>
@@ -26,7 +28,7 @@ const ProfileHeader = ({
               src={imgUrl}
               alt='Profile Image'
               fill
-              className=' rounded-full object-contain shadow-2xl'
+              className=' rounded-full object-cover shadow-2xl'
             />
           </div>
 
