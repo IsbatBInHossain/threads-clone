@@ -150,7 +150,7 @@ export async function fetchUsers({
   }
 }
 
-export async function getActivity(userId: string) {
+export async function getNotification(userId: string) {
   try {
     connectToDB()
 
